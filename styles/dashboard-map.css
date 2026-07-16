@@ -1,0 +1,250 @@
+/* --- GIS Map Workspace --- */
+.map-viewport {
+  flex-grow: 1;
+  position: relative;
+  height: 100%;
+  background-color: #E2E8F0; /* Default neutral GIS background */
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Simulated Vector City Grid */
+.map-svg-grid {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  cursor: grab;
+  transform-origin: center;
+  transition: transform 0.1s ease-out;
+}
+
+.map-svg-grid:active {
+  cursor: grabbing;
+}
+
+/* Water features, parks, streets and blocks */
+.map-water { fill: #93C5FD; opacity: 0.7; }
+.map-park { fill: #A7F3D0; opacity: 0.6; }
+.map-highway { stroke: #FFFFFF; stroke-width: 5; stroke-linecap: round; fill: none; }
+.map-highway-line { stroke: #F8FAFC; stroke-width: 3; stroke-linecap: round; fill: none; }
+.map-street { stroke: #E2E8F0; stroke-width: 2; stroke-linecap: round; fill: none; }
+.map-block { fill: #F1F5F9; stroke: #E2E8F0; stroke-width: 1; }
+
+/* Hotspots overlay pins */
+.map-hotspot-group {
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.map-hotspot-ring {
+  fill: none;
+  stroke-width: 3;
+  opacity: 0.8;
+  animation: pulse-ring 2.5s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
+  transform-origin: center;
+}
+
+.map-hotspot-core {
+  stroke: #FFFFFF;
+  stroke-width: 1.5;
+  transition: var(--transition-fast);
+}
+
+.map-hotspot-group:hover .map-hotspot-core {
+  r: 12px;
+  stroke-width: 3;
+}
+
+/* Warning badges overlay inside map nodes */
+.map-warning-label {
+  pointer-events: none;
+  font-family: var(--font-body);
+  font-size: 8px;
+  font-weight: bold;
+  fill: #FFFFFF;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+@keyframes pulse-ring {
+  0% {
+    r: 8px;
+    stroke-width: 4px;
+    opacity: 0.8;
+  }
+  100% {
+    r: 32px;
+    stroke-width: 1px;
+    opacity: 0;
+  }
+}
+
+/* --- Map Controls & Panels --- */
+.map-zoom-controls {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  z-index: 101;
+}
+
+.map-ctrl-btn {
+  width: 32px;
+  height: 32px;
+  background-color: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  color: var(--color-primary);
+  transition: var(--transition-fast);
+}
+
+.map-ctrl-btn:hover {
+  background-color: var(--color-bg-active);
+}
+
+/* Location Selector Widget */
+.map-location-selector {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  z-index: 101;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  padding: 0.4rem;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.map-location-selector select {
+  border: none;
+  background: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.gps-tracking-indicator {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-accent-blue);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.gps-pulse {
+  width: 8px;
+  height: 8px;
+  background-color: var(--color-accent-blue);
+  border-radius: 50%;
+  display: inline-block;
+  box-shadow: 0 0 8px var(--color-accent-blue);
+  animation: gps-blink 1.5s infinite;
+}
+
+@keyframes gps-blink {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+
+/* Coordinate Footer Bar */
+.map-coordinates-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  color: #F8FAFC;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.7rem;
+  border-radius: var(--radius-xs);
+  font-family: monospace;
+  z-index: 101;
+}
+
+/* Legend panel */
+.map-legend {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: var(--color-bg-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem var(--spacing-sm);
+  box-shadow: var(--shadow-md);
+  z-index: 101;
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.map-legend h4 {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  margin-bottom: 0.15rem;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* Simulation projections overlay */
+.sim-overlay-plume {
+  fill-opacity: 0.25;
+  stroke-width: 1.5;
+  stroke-dasharray: 4;
+  pointer-events: none;
+  animation: simulation-spread 3s ease-out infinite;
+}
+
+@keyframes simulation-spread {
+  0% { fill-opacity: 0.1; stroke-dashoffset: 0; }
+  50% { fill-opacity: 0.3; }
+  100% { fill-opacity: 0.1; stroke-dashoffset: 20; }
+}
+
+/* Map hover tooltip */
+.map-tooltip {
+  position: absolute;
+  background: rgba(15, 23, 42, 0.95);
+  color: #fff;
+  padding: 0.4rem var(--spacing-sm);
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  pointer-events: none;
+  z-index: 110;
+  display: none;
+  flex-direction: column;
+  gap: 0.15rem;
+  box-shadow: var(--shadow-md);
+}
+
+.map-tooltip h4 {
+  font-size: 0.8rem;
+  margin-bottom: 0.15rem;
+}

@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Urban Air Quality Command Center - Municipal Decision Support System</title>
+  <meta name="description" content="Government decision command center for urban air pollution. Real-time AQI tracking, AI prediction simulations, emergency dispatching, and citizen reports.">
+  
+  <!-- CSS Bundles -->
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/sections.css">
+  <link rel="stylesheet" href="styles/dashboard-map.css">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- Left Command Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="24" height="24" rx="4" fill="#1E293B" stroke="rgba(255,255,255,0.1)"/>
+          <path d="M12 4V20M4 12H20" stroke="var(--color-safe)" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="12" r="3" fill="var(--color-accent-blue)"/>
+        </svg>
+        <div>
+          <h1>UrbanAQI</h1>
+          <span>Command Center</span>
+        </div>
+      </div>
+      
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-item active" data-tab="dashboard">
+          <button>📊 Dashboard Overview</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="aqi">
+          <button>🗺️ Live AQI Map</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="prediction">
+          <button>🔮 AI Simulation</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="solutions">
+          <button>💡 AI Mitigation</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="priority">
+          <button>🚨 Emergency Response</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="alerts">
+          <button>🔔 Smart Alerts</button>
+        </li>
+        <li class="sidebar-nav-item" data-tab="reports">
+          <button>📢 Citizen Reports</button>
+        </li>
+      </ul>
+      
+      <div class="sidebar-footer">
+        <div>Node Cluster: Active (247)</div>
+        <div>System SLA Status: 98.4%</div>
+        <div>Version: v4.2.1-Gov</div>
+      </div>
+    </aside>
+
+    <!-- Main Command Workspace -->
+    <main class="main-workspace">
+      
+      <!-- Operations Panel Column -->
+      <section class="panel-container">
+        
+        <!-- Tab 1: Dashboard Overview -->
+        <div class="ops-panel active" id="dashboard-panel">
+          <div class="ops-panel-header">
+            <h2>Operations Overview</h2>
+            <p>Real-time telemetry and decision metrics for city administrators.</p>
+          </div>
+          
+          <div class="dashboard-grid">
+            <div class="stat-card">
+              <span class="stat-card-label">Overall City AQI</span>
+              <span class="stat-card-value" style="color: var(--color-dangerous);">210</span>
+              <span class="status-badge status-dangerous" style="margin-top:0.25rem;">Dangerous</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-label">Active Hotspots</span>
+              <span class="stat-card-value" id="dash-hotspots-count">3</span>
+              <span class="stat-card-footer">Requires mitigation</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-label">Affected Population</span>
+              <span class="stat-card-value">142,000</span>
+              <span class="stat-card-footer">Vulnerable citizens</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-label">Citizen Reports</span>
+              <span class="stat-card-value" id="dash-reports-count">2</span>
+              <span class="stat-card-footer">Logged & pending review</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="stat-card-label">City AQI Trend (24h)</span>
+            <div class="sparkline-container">
+              <svg class="sparkline-svg" viewBox="0 0 100 30" preserveAspectRatio="none">
+                <!-- Trend line simulation path -->
+                <path d="M 0 25 L 15 22 L 30 20 L 45 15 L 60 12 L 75 8 L 90 4 L 100 2"></path>
+              </svg>
+            </div>
+            <div class="stat-card-footer" style="display:flex; justify-content:space-between; margin-top:0.5rem;">
+              <span>Yesterday: 180 AQI</span>
+              <span>Predicted (Tomorrow): 240 AQI</span>
+            </div>
+          </div>
+
+          <div class="card">
+            <span class="stat-card-label">Environmental Summary</span>
+            <p style="font-size:0.8rem; color:var(--color-primary); margin-top:0.25rem;">
+              ⛅ Temp: 32°C | 💨 Wind: 4.2 km/h NW | 💧 Humidity: 62%
+            </p>
+            <p style="font-size:0.75rem; color:var(--color-text-muted); margin-top:0.25rem;">
+              AI Forecast Confidence: <strong>94.2%</strong> (historically checked). Wind patterns indicate high risk of pollutant accumulation in low-lying Ward 4 sectors.
+            </p>
+          </div>
+
+          <p style="font-size: 0.75rem; color: var(--color-text-light); text-align: center; margin-top: 1rem;">
+            Click on glowing hotspot overlays in the map to review localized emission parameters and dispatch field mitigation crews.
+          </p>
+        </div>
+
+        <!-- Tab 2: Live AQI Map View Details -->
+        <div class="ops-panel" id="aqi-panel">
+          <div class="ops-panel-header">
+            <h2>Live AQI Inspector</h2>
+            <p>Inspect spatial sensors and pollutant concentration profiles.</p>
+          </div>
+          
+          <div class="card">
+            <h4>Select Monitoring Station</h4>
+            <select class="form-control" style="margin-top:0.5rem;" onchange="if(this.value) window.gisMap.openHotspotDetails(window.gisMap.hotspots[this.value])">
+              <option value="">Choose active monitoring zone...</option>
+              <option value="0">Zone A - Industrial Corridor Block C (AQI 360)</option>
+              <option value="1">Zone B - Transit Terminal Intersection (AQI 285)</option>
+              <option value="2">Zone C - Central Market Plaza (AQI 165)</option>
+            </select>
+          </div>
+
+          <div class="card" style="font-size: 0.8rem;">
+            <h4 style="margin-bottom: 0.5rem;">Sensor Calibration status</h4>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span>Central Stations:</span> <span style="color:var(--color-safe); font-weight:bold;">● Calibrated</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+              <span>Geospatial Sat Satellites:</span> <span style="color:var(--color-safe); font-weight:bold;">● Active (Sentinel-5P)</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span>Community Grid Nodes:</span> <span style="color:var(--color-moderate); font-weight:bold;">● Maintenance Required (2)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: AI Simulation Workspace -->
+        <div class="ops-panel" id="prediction-panel">
+          <div class="ops-panel-header">
+            <h2>AI Planning & Simulation</h2>
+            <p>Simulate the future air quality impact of urban expansion and development proposals.</p>
+          </div>
+
+          <div class="card">
+            <div class="form-group">
+              <label for="sim-project-type">Proposed Development Project</label>
+              <select class="form-control" id="sim-project-type" onchange="window.gisMap.clearSimulation()">
+                <option value="factory">🏭 New Manufacturing Plant (Heavy Industry)</option>
+                <option value="highway">🛣️ Multi-Lane Expressway Corridor</option>
+                <option value="flyover">🏗️ Road Flyover Construction Site</option>
+                <option value="diversion">🚧 Heavy Vehicle Traffic Diversion Zone</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="sim-project-scale">Project Scale / Footprint</label>
+              <select class="form-control" id="sim-project-scale" onchange="window.gisMap.clearSimulation()">
+                <option value="1">Medium footprint (1x multiplier)</option>
+                <option value="2">Large scale corridor (2x multiplier)</option>
+                <option value="3">Mega industrial complex (3x multiplier)</option>
+              </select>
+            </div>
+            <p style="font-size: 0.75rem; color: var(--color-accent-blue); font-weight: 600;">
+              👉 Click anywhere on the map to position the simulation core and view the projected pollutant dispersion.
+            </p>
+          </div>
+
+          <!-- Simulation results card (hidden by default) -->
+          <div class="card" id="prediction-results-card" style="display:none; border-color: var(--color-accent-cyan); background-color: #F0FDFA;">
+            <h3 style="font-size: 1.1rem; color: var(--color-accent-blue); display:flex; justify-content:space-between; align-items:center;">
+              Simulation Output
+              <span class="status-badge" id="sim-risk-badge">HIGH RISK</span>
+            </h3>
+            
+            <div style="margin-top: 0.5rem; display: flex; justify-content: space-between; align-items: baseline;">
+              <span style="font-size:0.8rem; font-weight:bold;">Forecasted Peak AQI:</span>
+              <span id="sim-future-aqi" style="font-size: 1.5rem; font-weight:800; color:var(--color-dangerous);">280 AQI</span>
+            </div>
+
+            <div style="font-size:0.8rem; margin-top:0.5rem; display:flex; flex-direction:column; gap:0.25rem; border-top: 1px solid var(--color-border); padding-top:0.5rem;">
+              <div style="display:flex; justify-content:space-between;">
+                <span>Est. Exposed Population:</span> <strong id="sim-pop-exposed">25,000</strong>
+              </div>
+              <div style="display:flex; justify-content:space-between; font-weight: 600; margin-top: 0.25rem;">
+                <span>Impacted infrastructure:</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-left:0.5rem;">
+                <span>🏥 Hospitals:</span> <span id="sim-infra-hospitals">0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-left:0.5rem;">
+                <span>🏫 Schools:</span> <span id="sim-infra-schools">0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding-left:0.5rem;">
+                <span>💧 Water Bodies:</span> <span id="sim-infra-water">None</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 0.75rem; border-top: 1px dashed var(--color-border); padding-top: 0.5rem;">
+              <h4 style="font-size:0.8rem; color: var(--color-primary);">AI Explainability Rationale:</h4>
+              <p id="sim-ai-reasoning" style="font-size: 0.75rem; color: var(--color-text-muted); margin-top: 0.25rem; line-height: 1.4;">
+                Rationale loaded here.
+              </p>
+            </div>
+            
+            <button class="btn btn-primary" style="width:100%; margin-top:0.75rem;" onclick="window.gisMap.clearSimulation()">Reset Simulation</button>
+          </div>
+        </div>
+
+        <!-- Tab 4: AI Solutions Recommendations -->
+        <div class="ops-panel" id="solutions-panel">
+          <div class="ops-panel-header">
+            <h2>AI-Powered Mitigation</h2>
+            <p>Active policy recommendations and expected air quality improvements.</p>
+          </div>
+
+          <div class="ai-recommendation-card" style="margin-bottom:var(--spacing-sm);">
+            <h4>Heavy Vehicle Restriction Schedule</h4>
+            <p>Restricting commercial trucks at Zone B intersection from 7AM-10AM will clear bottlenecks contributing 58% of NO2.</p>
+            <div class="ai-rec-metrics">
+              <div>Est. Improvement: <span style="color:var(--color-safe);">-60 AQI</span></div>
+              <div>ETA: <span class="ai-rec-metric-val">1 hour</span></div>
+            </div>
+            <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">Dept: Traffic Authority</div>
+          </div>
+
+          <div class="ai-recommendation-card" style="margin-bottom:var(--spacing-sm);">
+            <h4>Shutdown cement kilns at Zone A</h4>
+            <p>Suspending industrial boilers temporarily during low-wind nights prevents hazardous PM2.5 accumulation.</p>
+            <div class="ai-rec-metrics">
+              <div>Est. Improvement: <span style="color:var(--color-safe);">-90 AQI</span></div>
+              <div>ETA: <span class="ai-rec-metric-val">Immediate</span></div>
+            </div>
+            <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">Dept: Pollution Control Board</div>
+          </div>
+
+          <div class="ai-recommendation-card">
+            <h4>Mist Cannon Sprinklers (Sector 8)</h4>
+            <p>Deploying mobile sprinklers reduces fugitive dust suspension by 25% near residential blocks.</p>
+            <div class="ai-rec-metrics">
+              <div>Est. Improvement: <span style="color:var(--color-safe);">-20 AQI</span></div>
+              <div>ETA: <span class="ai-rec-metric-val">2 hours</span></div>
+            </div>
+            <div style="font-size: 0.7rem; color: var(--color-text-muted); margin-top: 0.25rem;">Dept: Municipal Sanitation</div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Emergency Priority Response -->
+        <div class="ops-panel" id="priority-panel">
+          <div class="ops-panel-header">
+            <h2>Priority Dispatch Center</h2>
+            <p>Manage environmental emergency teams and critical hot-zones.</p>
+          </div>
+
+          <div class="emergency-header">
+            <span>⚠️</span>
+            <span>3 Severe Pollution Zones Require Action</span>
+          </div>
+
+          <div class="priority-list" id="priority-response-list">
+            
+            <!-- Item 1 -->
+            <div class="priority-card severity-severe">
+              <div class="priority-card-header">
+                <h3>Zone A - Industrial Block C</h3>
+                <span class="priority-status status-badge status-dangerous">CRITICAL</span>
+              </div>
+              <div class="priority-card-details">
+                <div>AQI Score: <strong>360</strong></div>
+                <div>Urgency Score: <strong>98/100</strong></div>
+                <div>Pop Exposed: <strong>48,000</strong></div>
+                <div>Authority: <strong>SPCB / MCD</strong></div>
+              </div>
+              <div class="priority-card-actions">
+                <button class="btn btn-accent dispatch-team-btn">⚡ Dispatch Crew</button>
+                <button class="btn btn-primary" onclick="window.gisMap.openHotspotDetails(window.gisMap.hotspots[0])">View Details</button>
+              </div>
+            </div>
+
+            <!-- Item 2 -->
+            <div class="priority-card severity-unhealthy">
+              <div class="priority-card-header">
+                <h3>Zone B - Transit Terminal</h3>
+                <span class="priority-status status-badge status-unhealthy">UNASSIGNED</span>
+              </div>
+              <div class="priority-card-details">
+                <div>AQI Score: <strong>285</strong></div>
+                <div>Urgency Score: <strong>82/100</strong></div>
+                <div>Pop Exposed: <strong>72,000</strong></div>
+                <div>Authority: <strong>Traffic Police</strong></div>
+              </div>
+              <div class="priority-card-actions">
+                <button class="btn btn-accent dispatch-team-btn">⚡ Dispatch Crew</button>
+                <button class="btn btn-primary" onclick="window.gisMap.openHotspotDetails(window.gisMap.hotspots[1])">View Details</button>
+              </div>
+            </div>
+
+            <!-- Item 3 -->
+            <div class="priority-card severity-moderate" style="border-left-color: var(--color-moderate);">
+              <div class="priority-card-header">
+                <h3>Zone C - Central Market</h3>
+                <span class="priority-status status-badge status-moderate">MONITORING</span>
+              </div>
+              <div class="priority-card-details">
+                <div>AQI Score: <strong>165</strong></div>
+                <div>Urgency Score: <strong>65/100</strong></div>
+                <div>Pop Exposed: <strong>22,000</strong></div>
+                <div>Authority: <strong>MCD Inspector</strong></div>
+              </div>
+              <div class="priority-card-actions">
+                <button class="btn btn-accent dispatch-team-btn">⚡ Dispatch Crew</button>
+                <button class="btn btn-primary" onclick="window.gisMap.openHotspotDetails(window.gisMap.hotspots[2])">View Details</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 6: Smart Alerts Feed -->
+        <div class="ops-panel" id="alerts-panel">
+          <div class="ops-panel-header">
+            <h2>Smart Alerts Feed</h2>
+            <p>System-generated anomalies and compliance warnings.</p>
+          </div>
+
+          <div class="alert-list">
+            
+            <div class="alert-card">
+              <div class="alert-indicator severe"></div>
+              <div class="alert-body">
+                <h4>AQI Threshold Exceeded (Zone A)</h4>
+                <p>Telemetry reports particulate levels at 360. Core source identified as industrial kiln emissions.</p>
+                <div class="alert-meta">
+                  <span>Severity: Severe</span> | <span>2 mins ago</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--color-dangerous); font-weight:600; margin-top:0.25rem;">
+                  Action: Restrict industrial boilers immediately.
+                </div>
+              </div>
+            </div>
+
+            <div class="alert-card">
+              <div class="alert-indicator dangerous"></div>
+              <div class="alert-body">
+                <h4>Hospital Safety Risk Alert</h4>
+                <p>Air index exceeds 280 AQI within 400m of City Pediatric Center. High ozone concentrations.</p>
+                <div class="alert-meta">
+                  <span>Severity: Dangerous</span> | <span>15 mins ago</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--color-dangerous); font-weight:600; margin-top:0.25rem;">
+                  Action: Activate local building purification systems.
+                </div>
+              </div>
+            </div>
+
+            <div class="alert-card">
+              <div class="alert-indicator unhealthy"></div>
+              <div class="alert-body">
+                <h4>Citizen Reports Surge</h4>
+                <p>Garbage burning report logs spiked (+300%) in Ward 4 residential sector.</p>
+                <div class="alert-meta">
+                  <span>Severity: Moderate</span> | <span>45 mins ago</span>
+                </div>
+                <div style="font-size:0.75rem; color:var(--color-unhealthy); font-weight:600; margin-top:0.25rem;">
+                  Action: Route sanitation patrol units to inspect landfill.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Tab 7: Citizen Reporting Portal -->
+        <div class="ops-panel" id="reports-panel">
+          <div class="ops-panel-header">
+            <h2>Citizen Reports</h2>
+            <p>Enables residents to log pollution issues for field verification.</p>
+          </div>
+
+          <div class="card">
+            <h4>Submit Environmental Report</h4>
+            <form id="citizen-complaint-form" style="margin-top:0.5rem;">
+              <div class="form-group">
+                <label for="citizen-cat">Pollution Category</label>
+                <select class="form-control" id="citizen-cat">
+                  <option value="Garbage burning">🔥 Garbage burning / Open fires</option>
+                  <option value="Construction dust">🏗️ Construction dust / Loose gravel</option>
+                  <option value="Industrial smoke">🏭 Industrial smoke leakage</option>
+                  <option value="Vehicle emissions">🚛 Heavy vehicle tailpipe emissions</option>
+                  <option value="Illegal dumping">🗑️ Illegal garbage dumping</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="citizen-desc">Description of Source</label>
+                <textarea class="form-control" id="citizen-desc" rows="3" placeholder="State nearest landmarks, street, or time observed..."></textarea>
+              </div>
+              <p style="font-size:0.7rem; color:var(--color-text-muted); margin-bottom: 0.5rem;">
+                📌 Submitting will automatically drop a report pin on the map at coordinate center.
+              </p>
+              <button type="submit" class="btn btn-primary" style="width:100%;">Submit Complaint Log</button>
+            </form>
+          </div>
+
+          <div class="ops-panel-header" style="margin-top: 1rem; border-top: 1px solid var(--color-border-light); padding-top: 0.5rem;">
+            <h3>Verified Reports Feed</h3>
+          </div>
+          
+          <div class="citizen-reports-list" id="citizen-reports-feed">
+            <div class="citizen-report-card">
+              <div class="citizen-report-header">
+                <h4>Garbage burning</h4>
+                <span class="status-badge status-moderate">In Progress</span>
+              </div>
+              <p class="citizen-report-desc">Open burning of plastic waste behind market yard.</p>
+              <div class="citizen-report-meta">
+                <span>ID: AQI-REP-10294</span> | <span>Ward 4</span> | <span>2 hours ago</span>
+              </div>
+            </div>
+            
+            <div class="citizen-report-card">
+              <div class="citizen-report-header">
+                <h4>Construction dust</h4>
+                <span class="status-badge status-safe">Resolved</span>
+              </div>
+              <p class="citizen-report-desc">No cover sheets over sand piles at building site.</p>
+              <div class="citizen-report-meta">
+                <span>ID: AQI-REP-09431</span> | <span>Sector 8</span> | <span>Yesterday</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- Center-Right GIS Map Workspace -->
+      <div class="map-viewport" id="map-viewport">
+        
+        <!-- Interactive Controls -->
+        <div class="map-location-selector">
+          📍 <select id="map-city-select" onchange="alert('Command Center Map Centered on: ' + this.value)">
+            <option value="Hyderabad Command Hub">Hyderabad Center Hub</option>
+            <option value="Bengaluru Urban Core">Bengaluru Command Hub</option>
+            <option value="National Capital Region (Delhi)">NCR Delhi Command Hub</option>
+          </select>
+          <div class="gps-tracking-indicator" id="track-loc" style="cursor:pointer;" title="Track Location">
+            <span class="gps-pulse"></span> Track GPS
+          </div>
+        </div>
+
+        <div class="map-zoom-controls">
+          <button class="map-ctrl-btn" id="zoom-in" title="Zoom In">+</button>
+          <button class="map-ctrl-btn" id="zoom-out" title="Zoom Out">-</button>
+        </div>
+
+        <!-- Legends Grid -->
+        <div class="map-legend">
+          <h4>AQI Severity Index</h4>
+          <div class="legend-row"><span class="legend-color" style="background-color:var(--color-safe);"></span> 0-50 (Safe)</div>
+          <div class="legend-row"><span class="legend-color" style="background-color:var(--color-moderate);"></span> 51-100 (Moderate)</div>
+          <div class="legend-row"><span class="legend-color" style="background-color:var(--color-unhealthy);"></span> 101-200 (Unhealthy)</div>
+          <div class="legend-row"><span class="legend-color" style="background-color:var(--color-dangerous);"></span> 201-300 (Dangerous)</div>
+          <div class="legend-row"><span class="legend-color" style="background-color:var(--color-severe);"></span> 301+ (Severe)</div>
+        </div>
+
+        <!-- Coordinates Bar -->
+        <div class="map-coordinates-bar" id="map-coords">
+          LAT: 17.385044° N | LNG: 78.486671° E | ZOOM: 1.0x
+        </div>
+
+        <!-- Tooltip overlay -->
+        <div class="map-tooltip" id="map-tooltip"></div>
+
+        <!-- Simulated Vector SVG Map -->
+        <svg class="map-svg-grid" id="map-svg-grid" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- Plume Dispersion Gradient -->
+            <radialGradient id="sim-gradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="var(--color-dangerous)" stop-opacity="0.6"/>
+              <stop offset="60%" stop-color="var(--color-unhealthy)" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="var(--color-moderate)" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+
+          <!-- Landmass block grids -->
+          <rect x="0" y="0" width="800" height="500" fill="#E2E8F0" />
+          
+          <!-- Blocks / Sectors -->
+          <rect x="50" y="40" width="220" height="150" class="map-block" />
+          <rect x="300" y="40" width="180" height="120" class="map-block" style="fill: #CBD5E1;" /> <!-- Industrial Block -->
+          <rect x="510" y="40" width="240" height="180" class="map-block" />
+          <rect x="50" y="220" width="180" height="240" class="map-block" />
+          <rect x="250" y="220" width="300" height="240" class="map-block" />
+          <rect x="570" y="240" width="180" height="220" class="map-block" />
+
+          <!-- River/Water Body -->
+          <path d="M 0 380 Q 200 370 320 280 T 500 240 T 800 220 L 800 250 T 500 270 T 320 310 Q 200 410 0 410 Z" class="map-water" />
+          
+          <!-- Park green zones -->
+          <rect x="80" y="260" width="100" height="120" rx="10" class="map-park" />
+          <circle cx="680" cy="340" r="50" class="map-park" />
+
+          <!-- Streets/Grid Lines -->
+          <line x1="280" y1="0" x2="280" y2="500" class="map-street" />
+          <line x1="560" y1="0" x2="560" y2="500" class="map-street" />
+          <line x1="0" y1="200" x2="800" y2="200" class="map-street" />
+          <line x1="0" y1="440" x2="800" y2="440" class="map-street" />
+          
+          <!-- Highways -->
+          <path d="M 0 80 Q 400 90 800 60" class="map-highway" />
+          <path d="M 0 80 Q 400 90 800 60" class="map-highway-line" />
+          
+          <path d="M 400 0 L 400 500" class="map-highway" />
+          <path d="M 400 0 L 400 500" class="map-highway-line" />
+
+          <!-- Simulations Projections Layer -->
+          <g id="map-simulations-layer"></g>
+
+          <!-- Citizen Reports Layer -->
+          <g id="map-complaints-layer"></g>
+
+          <!-- Hotspots Layer (Pulsing Circles) -->
+          <g id="map-hotspots-layer"></g>
+        </svg>
+
+      </div>
+
+      <!-- Selected Hotspot Panel Drawer (Slide-out) -->
+      <aside class="hotspot-side-panel" id="selected-hotspot-panel">
+        <div class="panel-title-bar">
+          <h3 class="hotspot-loc-name">Selected Hotspot</h3>
+          <button class="panel-close-btn" id="close-hotspot-panel">✕</button>
+        </div>
+        
+        <div class="panel-scroll-content">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.25rem;">
+              <span class="hotspot-aqi-badge status-badge status-severe">AQI: 360</span>
+              <span style="font-size:0.75rem; color:var(--color-text-muted);">Dominant: <strong class="hotspot-pollutant">PM2.5</strong></span>
+            </div>
+            <p style="font-size:0.8rem; color:var(--color-text-muted);">
+              Estimated affected population count inside dispersion radius: <strong>48,000 citizens</strong>.
+            </p>
+          </div>
+
+          <!-- Section: Sensitive Infrastructure -->
+          <div>
+            <h4 class="panel-section-title">Sensitive Infrastructure nearby</h4>
+            <div class="sensitive-grid hotspot-infra-grid">
+              <!-- JS Populates this -->
+            </div>
+          </div>
+
+          <!-- Section: Pollution Sources -->
+          <div>
+            <h4 class="panel-section-title">Telemetry Attribution (Sources)</h4>
+            <div class="hotspot-sources-list">
+              <!-- JS Populates this -->
+            </div>
+          </div>
+
+          <!-- Section: AI Recommended Interventions -->
+          <div>
+            <h4 class="panel-section-title" style="color:var(--color-accent-blue);">AI MITIGATION INTERVENTIONS</h4>
+            <div class="hotspot-recs-list">
+              <!-- JS Populates this -->
+            </div>
+          </div>
+        </div>
+      </aside>
+
+    </main>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/gis-map.js"></script>
+  <script src="js/dashboard-logic.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

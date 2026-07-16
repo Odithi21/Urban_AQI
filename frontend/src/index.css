@@ -1,0 +1,103 @@
+@import "tailwindcss";
+@import 'leaflet/dist/leaflet.css';
+
+@theme {
+  --color-background: #090d16;
+  --color-surface: #111827;
+  --color-surface-light: #1f2937;
+  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border-light: rgba(255, 255, 255, 0.04);
+  
+  --color-safe: #22c55e;
+  --color-moderate: #3b82f6;
+  --color-unhealthy: #eab308;
+  --color-dangerous: #f97316;
+  --color-severe: #ef4444;
+  
+  --color-accent-blue: #3b82f6;
+  --color-accent-cyan: #06b6d4;
+  --color-accent-purple: #8b5cf6;
+  
+  --color-text-primary: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  --color-text-light: #d1d5db;
+  
+  --font-sans: "Inter", "system-ui", "sans-serif";
+  --font-mono: "JetBrains Mono", "monospace";
+  
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --shadow-glass-glow: 0 8px 32px 0 rgba(6, 182, 212, 0.15);
+  --shadow-glow: 0 0 15px rgba(59, 130, 246, 0.5);
+  --shadow-glow-green: 0 0 15px rgba(34, 197, 94, 0.5);
+  --shadow-glow-red: 0 0 15px rgba(239, 68, 68, 0.5);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-text-primary antialiased selection:bg-accent-blue/30 selection:text-white;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  /* Custom Webkit scrollbar for sleek console look */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #090d16;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1f2937;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #374151;
+  }
+}
+
+/* Custom styles for Leaflet Map to fit dark theme */
+.leaflet-container {
+  background: #0b0f19 !important;
+  width: 100%;
+  height: 100%;
+}
+
+/* Invert OSM tiles slightly for a premium sci-fi dark command map look */
+.dark-map-tiles {
+  filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* Animations */
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes map-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+.map-glow-pulse {
+  animation: map-pulse 2s infinite;
+}

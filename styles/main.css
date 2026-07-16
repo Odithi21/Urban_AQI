@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+
+/* --- Reset & Layout --- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  font-family: var(--font-body);
+  color: var(--color-primary);
+  background-color: var(--color-bg-main);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* --- Left Command Sidebar --- */
+.sidebar {
+  width: 250px;
+  background-color: #0F172A; /* Deep Slate 900 for executive command feel */
+  color: #F8FAFC;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar-logo {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sidebar-logo svg {
+  width: 28px;
+  height: 28px;
+}
+
+.sidebar-logo h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.sidebar-logo span {
+  display: block;
+  font-size: 0.65rem;
+  color: var(--color-safe);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  list-style: none;
+  padding: var(--spacing-sm) 0;
+  flex-grow: 1;
+}
+
+.sidebar-nav-item button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: #94A3B8;
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: var(--transition-fast);
+}
+
+.sidebar-nav-item button:hover {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-nav-item.active button {
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--color-accent-blue);
+  font-weight: 600;
+}
+
+.sidebar-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.75rem;
+  color: #64748B;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* --- Main Workspace --- */
+.main-workspace {
+  flex-grow: 1;
+  display: flex;
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* --- Left Operations Panel Container --- */
+.panel-container {
+  width: 440px;
+  background-color: var(--color-bg-panel);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  height: 100%;
+  z-index: 10;
+  overflow: hidden;
+  transition: var(--transition-normal);
+}
+
+.ops-panel {
+  display: none;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--spacing-md);
+}
+
+.ops-panel.active {
+  display: flex;
+}
+
+.ops-panel-header {
+  margin-bottom: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border-light);
+  padding-bottom: var(--spacing-sm);
+}
+
+.ops-panel-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--color-primary);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.ops-panel-header p {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+/* --- Common UI Utilities --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  background-color: #FFFFFF;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  gap: 0.35rem;
+  transition: var(--transition-fast);
+}
+
+.btn:hover {
+  background-color: var(--color-bg-active);
+  border-color: var(--color-border-hover);
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF;
+  border-color: var(--color-primary);
+}
+
+.btn-primary:hover {
+  background-color: #1E293B;
+  border-color: #1E293B;
+}
+
+.btn-accent {
+  background-color: var(--color-accent-blue);
+  color: #FFFFFF;
+  border-color: var(--color-accent-blue);
+}
+
+.btn-accent:hover {
+  background-color: var(--color-secondary-hover);
+  border-color: var(--color-secondary-hover);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-xs);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+/* Status variants */
+.status-safe { background-color: #ECFDF5; color: var(--color-safe); }
+.status-moderate { background-color: #FFFBEB; color: var(--color-moderate); }
+.status-unhealthy { background-color: #FF7E001A; color: var(--color-unhealthy); }
+.status-dangerous { background-color: #FEF2F2; color: var(--color-dangerous); }
+.status-severe { background-color: #F5F3FF; color: var(--color-severe); }
+
+.card {
+  background-color: #FFFFFF;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.form-group {
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: var(--color-primary);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+  outline: none;
+  font-family: var(--font-body);
+}
+
+.form-control:focus {
+  border-color: var(--color-accent-blue);
+}
+
+/* --- Scrollbars --- */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-main);
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
