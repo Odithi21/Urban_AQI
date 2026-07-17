@@ -1,0 +1,2 @@
+import SiteHeader from "./SiteHeader";
+export default function PageShell({ children }) { return <div className="min-h-screen bg-background text-text-primary"><SiteHeader />{children}<footer className="site-footer">© 2026 UrbanAQI · <a href="https://fastapi.tiangolo.com/" target="_blank" rel="noreferrer">FastAPI</a> · <a href="https://react.dev/" target="_blank" rel="noreferrer">React</a> · <a href="https://leafletjs.com/" target="_blank" rel="noreferrer">Leaflet</a></footer></div>; }

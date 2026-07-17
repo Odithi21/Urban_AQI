@@ -27,6 +27,10 @@ class SimulationRequest(BaseModel):
     latitude: float
     longitude: float
 
+class ReportGenerateRequest(BaseModel):
+    format: str = "pdf"
+    city: Optional[str] = None
+
 # Helper to automatically update database if telemetry is stale (more than 10 minutes old)
 LAST_TELEMETRY_REFRESH = {"time": None}
 
@@ -41,6 +45,7 @@ def ensure_fresh_telemetry(db: Session):
             print(f"Error during auto-ingestion refresh: {e}")
 
 @router.get("/current-aqi")
+@router.get("/aqi/current")
 def get_current_aqi(city: Optional[str] = None, db: Session = Depends(get_db)):
     ensure_fresh_telemetry(db)
     
@@ -95,6 +100,7 @@ def get_current_aqi(city: Optional[str] = None, db: Session = Depends(get_db)):
     }
 
 @router.get("/forecast")
+@router.get("/aqi/forecast")
 def get_aqi_forecast(station_id: Optional[int] = None, city: Optional[str] = None, ward: Optional[str] = None, db: Session = Depends(get_db)):
     ensure_fresh_telemetry(db)
     
@@ -176,6 +182,7 @@ def get_weather_summary(city: Optional[str] = None, db: Session = Depends(get_db
     }
 
 @router.get("/source-attribution")
+@router.get("/sources/attribution")
 def get_source_attribution(station_id: Optional[int] = None, city: Optional[str] = None, ward: Optional[str] = None, db: Session = Depends(get_db)):
     ensure_fresh_telemetry(db)
     
@@ -257,6 +264,7 @@ def get_hotspots(city: Optional[str] = None, db: Session = Depends(get_db)):
     return results
 
 @router.get("/advisory")
+@router.get("/health/risk")
 def get_citizen_advisory(city: str, ward: str, db: Session = Depends(get_db)):
     ensure_fresh_telemetry(db)
     
@@ -329,6 +337,7 @@ def get_citizen_advisory(city: str, ward: str, db: Session = Depends(get_db)):
     }
 
 @router.get("/recommendations")
+@router.get("/actions/recommend")
 def get_mitigation_and_enforcement(city: Optional[str] = None, db: Session = Depends(get_db)):
     ensure_fresh_telemetry(db)
     
@@ -635,3 +644,10 @@ def get_reports(format: str = Query("csv", regex="^(pdf|csv)$"), city: Optional[
             media_type="application/pdf",
             headers={"Content-Disposition": f"attachment; filename={filename}"}
         )
+
+@router.post("/reports/generate")
+def generate_report(request: ReportGenerateRequest, db: Session = Depends(get_db)):
+    """Compatibility endpoint for clients that generate reports with a POST body."""
+    if request.format not in {"pdf", "csv"}:
+        raise HTTPException(status_code=422, detail="format must be either 'pdf' or 'csv'")
+    return get_reports(format=request.format, city=request.city, db=db)
