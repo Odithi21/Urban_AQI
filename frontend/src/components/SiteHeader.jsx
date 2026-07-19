@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { Menu, X, Wind } from "lucide-react";
+import ThemeToggle from "./ThemeToggle";
 
 const links = [
   ["Architecture", "/architecture"],
@@ -23,6 +24,8 @@ export default function SiteHeader() {
       </button>
       <nav className={`site-nav ${open ? "site-nav--open" : ""}`} aria-label="Main navigation">
         {links.map(([label, to]) => <NavLink key={to} to={to} onClick={close}>{label}</NavLink>)}
+        <NavLink to="/signin" onClick={close}>Sign in</NavLink>
+        <ThemeToggle />
         <Link to="/dashboard" onClick={close} className="nav-cta">Open dashboard</Link>
       </nav>
     </div>

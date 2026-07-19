@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTelemetry } from "../hooks/useTelemetry";
 import { aqiService } from "../services/aqiService";
 import { mapService } from "../services/mapService";
 import { populationService } from "../services/populationService";
 import MapComponent from "../components/MapComponent";
+import ThemeToggle from "../components/ThemeToggle";
 
 import {
   ResponsiveContainer,
@@ -111,6 +113,17 @@ export default function CommandCenter() {
     setSimCoords(null);
     setSimResult(null);
   }, [telemetry]);
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (!user) {
+      navigate("/auth/signin");
+    }
+  }, [navigate]);
+
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+  const initials = user && user.name ? user.name.split(" ").map(n => n[0]).slice(0,2).join("") : "";
 
   // Load detailed forecast when selected station changes
   useEffect(() => {
@@ -325,6 +338,10 @@ export default function CommandCenter() {
 
         {/* Sidebar Footer */}
         <div className="p-4 border-t border-border bg-[#0a0f19] text-[10px] text-text-muted space-y-1">
+          <div className="flex items-center justify-between pb-2 mb-2 border-b border-border/10">
+            <span className="uppercase font-bold tracking-wider">Theme</span>
+            <ThemeToggle compact />
+          </div>
           <div className="flex justify-between">
             <span>Node Cluster:</span>
             <span className="text-safe font-semibold">Active ({telemetry?.stations?.length || 18})</span>
@@ -889,6 +906,18 @@ export default function CommandCenter() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Profile + Quick Export Controls */}
+            {user && (
+              <div className="flex items-center gap-3 mr-2">
+                <div className="w-8 h-8 rounded-full bg-accent-blue flex items-center justify-center text-sm font-bold text-white">
+                  {initials}
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-bold text-white">{user.name}</div>
+                  <div className="text-[10px] text-text-muted truncate">{user.email}</div>
+                </div>
+              </div>
+            )}
             {/* Quick Export Controls */}
             <button
               onClick={() => aqiService.downloadReport("csv", selectedCity)}

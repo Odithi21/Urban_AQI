@@ -5,9 +5,12 @@ from sqlalchemy import func
 from datetime import datetime, timedelta
 from typing import Optional, List
 from pydantic import BaseModel
+import hashlib
+import os
+import binascii
 
 from ..database.db import get_db
-from ..database.models import MonitoringStation, AQIHistory, AQIForecast, SourceAttribution, Alert, CitizenReport, WardPopulation
+from ..database.models import MonitoringStation, AQIHistory, AQIForecast, SourceAttribution, Alert, CitizenReport, WardPopulation, User
 from ..services.ingestion import ingest_live_data, load_worldpop_data
 from ..utils.reports import generate_csv_report, generate_pdf_report
 
@@ -31,6 +34,18 @@ class ReportGenerateRequest(BaseModel):
     format: str = "pdf"
     city: Optional[str] = None
 
+
+# Simple auth models for signup/signin
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class SigninRequest(BaseModel):
+    email: str
+    password: str
+
 # Helper to automatically update database if telemetry is stale (more than 10 minutes old)
 LAST_TELEMETRY_REFRESH = {"time": None}
 
@@ -43,6 +58,43 @@ def ensure_fresh_telemetry(db: Session):
             LAST_TELEMETRY_REFRESH["time"] = now
         except Exception as e:
             print(f"Error during auto-ingestion refresh: {e}")
+
+
+@router.post("/signup", status_code=status.HTTP_201_CREATED)
+def signup(request: SignupRequest, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(func.lower(User.email) == request.email.lower()).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+
+    salt = os.urandom(16)
+    pwd_hash = hashlib.pbkdf2_hmac('sha256', request.password.encode('utf-8'), salt, 100000)
+
+    user = User(
+        name=request.name,
+        email=request.email.lower(),
+        password_hash=binascii.hexlify(pwd_hash).decode('utf-8'),
+        salt=binascii.hexlify(salt).decode('utf-8'),
+        created_at=datetime.utcnow()
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return {"id": user.id, "name": user.name, "email": user.email, "created_at": user.created_at}
+
+
+@router.post("/signin")
+def signin(request: SigninRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(func.lower(User.email) == request.email.lower()).first()
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    salt = binascii.unhexlify(user.salt)
+    pwd_hash = hashlib.pbkdf2_hmac('sha256', request.password.encode('utf-8'), salt, 100000)
+    if binascii.hexlify(pwd_hash).decode('utf-8') != user.password_hash:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    return {"id": user.id, "name": user.name, "email": user.email, "created_at": user.created_at}
 
 @router.get("/current-aqi")
 @router.get("/aqi/current")
