@@ -4,15 +4,13 @@ import { Menu, X, Wind } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const links = [
-  ["Architecture", "/architecture"],
-  ["Features", "/features/aqi-intelligence"],
-  ["Help", "/docs"],
   ["Feedback", "/contact"],
 ];
 
 export default function SiteHeader() {
   const [open, setOpen] = useState(false);
   const close = () => setOpen(false);
+
   return <header className="site-header">
     <div className="site-header__inner">
       <Link to="/" className="brand" aria-label="UrbanAQI home" onClick={close}>
